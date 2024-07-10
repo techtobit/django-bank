@@ -35,7 +35,7 @@ def DepositView(request):
         transaction.account=account
         transaction.transaction_type='deposit'
         transaction.balance_after_transaction= account.balance+transaction.amount
-        account.balance+=transaction.balance_after_transaction
+        account.balance=transaction.balance_after_transaction
         account.save()
         transaction.save()
         return redirect(reverse_lazy('home'))

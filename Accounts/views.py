@@ -7,9 +7,7 @@ from django.contrib import messages
 from django.http import HttpResponse
 from django.conf import settings
 from django.core.mail import send_mail
-
 from .forms import RegistrationForm , UpdateProfileForm
-
 def RegistrationView(request):
 	if request.method == "POST":
 		form = RegistrationForm(request.POST)
@@ -46,7 +44,6 @@ def LoginView(request):
 def LogoutView(request):
 		logout(request)
 		return redirect('login')
-
 
 def UpdateProfileView(request):
 	if request.method=='POST':
