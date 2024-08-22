@@ -10,9 +10,12 @@
   {% bootstrap_css %}
   {% bootstrap_javascript %}
 </head>
-<body>
+<body >
 	{% include "nav.html" %}
-	{% block content %}
-	{% endblock content %}
+	<div >
+		{% block title %}{% endblock title %}
+		{% block content %}
+		{% endblock content %}
+	</div>
 </body>
 </html>

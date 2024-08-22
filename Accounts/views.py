@@ -1,13 +1,13 @@
 from django.shortcuts import render, redirect
-from django.contrib.auth.forms import UserCreationForm
+from .forms import RegistrationForm
 
 def RegistrationView(request):
 	if request.method == "POST":
-		form = UserCreationForm(request.POST)
+		form = RegistrationForm(request.POST)
 		if form.is_valid:
 			form = form.save()
-			return redirect('')
+			return redirect('home')
 	else:
-		form = UserCreationForm()
+		form = RegistrationForm()
 	return render(request, 'registration.html', {'form': form})
 		
