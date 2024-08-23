@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.models import User
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, logout
 from django.http import HttpResponse
 from .forms import RegistrationForm
 
@@ -28,3 +28,9 @@ def LoginView(request):
 			response= HttpResponse ('Not valid user id , password')
 			return response
 	return render(request, 'login.html')
+
+def LogoutView(request):
+	# if request.method=="POST":
+		logout(request)
+		return redirect('login')
+

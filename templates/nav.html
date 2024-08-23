@@ -16,8 +16,18 @@
     </ul>
   </div>
   <div class=" my-2 my-sm-0" >
-    <a href={% url 'login' %} class="btn btn-warning my-2 my-sm-0" >LogIn</a>
-    <a href={% url 'register' %} class="btn btn-success my-2 my-sm-0" >Create Account</a>
+    {% if request.user.is_authenticated %}
+    <div class="d-flex gap-2">
+      <a href={% url 'login' %} class="btn btn-warning my-2 my-sm-0" >Profile</a>
+      <form  method="POST" action="{% url 'logout' %}" >
+        {% csrf_token %}
+        <button type='submit' class="btn btn-danger my-2 my-sm-0" >Logout</button>
+      </form>
+    </div>
+    {% else %}
+      <a href={% url 'login' %} class="btn btn-warning my-2 my-sm-0" >LogIn</a>
+      <a href={% url 'register' %} class="btn btn-success my-2 my-sm-0" >Create Account</a>
+    {% endif %}
   </div>
 </nav>
 
