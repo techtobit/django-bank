@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block title %}
+<h1 class='text-center pt-4'>Account Login</h1>
+{% endblock title %}
+
+
+
+{% block content %}
+{% load crispy_forms_tags %}
+{% comment %} <div class='container p-5 '>
+	<form method="POST" class="form-group">
+		{% csrf_token %}
+		{{ form|crispy}}
+		<button type="submit" class="btn btn-success">Login</button>
+	</form>
+</div> {% endcomment %}
+
+<form  class="col-6 mx-auto card p-3 shadow-lg" method="post" enctype="multipart/form-data">
+
+	{% csrf_token %} 
+
+	<!-- Display error/success messages -->
+	{% if messages %}
+	<div class="alert alert-primary" role="alert">
+			{% for message in messages %}
+			{{ message }}
+			{% endfor %}
+	</div>
+	{% endif %}
+
+
+	<div class="form-group">
+			<label for="exampleInputEmail1">Username</label>
+			<input type="text" class="form-control" name="username" id="exampleInputEmail1" aria-describedby="emailHelp"
+					placeholder="Enter username" required>
+	</div>
+
+	<div class="form-group">
+			<label for="exampleInputPassword1">Password</label>
+			<input type="password" name="password" class="form-control" id="exampleInputPassword1" placeholder="Password" required>
+	</div>
+
+	<p>Don't have an account <a href="{% url 'register' %}" >Register</a> </p>
+
+	<button type="submit" class="btn btn-primary">Submit</button>
+</form>
+{% endblock content %}
