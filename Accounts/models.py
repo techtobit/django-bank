@@ -12,9 +12,9 @@ class Account(models.Model):
 	gender = models.CharField(verbose_name='Gender', choices=GENDER, max_length=50, default=None)
 	account_type= models.CharField(verbose_name='Account Type', choices=ACCOUNT_TYPE, default=None, max_length=50)
 	account_number=  models.IntegerField(verbose_name='Account Number',
-		validators=[MaxValueValidator(5),]
+		validators=[MaxValueValidator(5)]
 	)
-	balance = models.DecimalField(verbose_name='Accoount Balance',  max_digits=5, decimal_places=2),
+	balance =models.DecimalField(default=0, max_digits=12, decimal_places=2)
 	initial_deposit_date = models.DateTimeField( auto_now_add=True)
 
 class UserAddress(models.Model):
