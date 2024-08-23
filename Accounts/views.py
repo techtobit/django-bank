@@ -4,8 +4,8 @@ from .forms import RegistrationForm
 def RegistrationView(request):
 	if request.method == "POST":
 		form = RegistrationForm(request.POST)
-		if form.is_valid:
-			form = form.save()
+		if form.is_valid():
+			form.save()
 			return redirect('home')
 	else:
 		form = RegistrationForm()
