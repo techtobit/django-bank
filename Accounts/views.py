@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
 from django.http import HttpResponse
-from .forms import RegistrationForm
+from .forms import RegistrationForm , UpdateProfileForm
 
 def RegistrationView(request):
 	if request.method == "POST":
@@ -33,4 +33,14 @@ def LogoutView(request):
 	# if request.method=="POST":
 		logout(request)
 		return redirect('login')
+
+
+def UpdateProfileView(request):
+	if request.method=='POST':
+		form =UpdateProfileForm(request.POST, instance=request.user)
+		if form.is_valid():
+			form.save()
+	else:
+		form = UpdateProfileForm(instance=request.user)
+	return render(request, 'profile.html', {'form': form})
 
