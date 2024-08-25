@@ -3,6 +3,8 @@ from django.urls import reverse_lazy
 from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+from datetime import datetime  
+from django.db.models import Sum
 from .forms import TransactionForm, DepositForm, WithdrawForm, LoanRequestForm
 from .constants import TRANSACTIONS_TYPE
 from Transactions.models import Transaction
@@ -52,7 +54,7 @@ def WithdrawView(request):
     
     return render(request, 'transaction_form.html', {'form': form, 'title':'Withdraw Money'})
 
-
+@login_required
 def LoanRequestView(request):
     account=request.user.account
     form=LoanRequestForm(request.POST or None, account=account)
@@ -79,7 +81,7 @@ def LoanRequestView(request):
     loan_list=Transaction.objects.filter(account=account, transaction_type='loan')
     return render(request, 'transaction_form.html', {'form': form, 'loan_list':loan_list, 'title':'Loan Request'})
 
-
+@login_required
 def ApproveLoanView(request, loan_id):
     account=request.user.account
     # loan=Transaction.objects.filter(account=account, id=loan_id, transaction_type='loan')
@@ -93,4 +95,32 @@ def ApproveLoanView(request, loan_id):
         messages.info(request, 'This loan has already been approved.')
     return redirect('loan_request')
 
+
+def TransactionReportView(request):
+    account=request.user.account
+    transactions= Transaction.objects.filter(account=account)
+
+    balance=0
+    start_date_str=request.GET.get('start_date')
+    end_date_str=request.GET.get('end_date')
+
+    if start_date_str and end_date_str:
+        start_date_str=datetime.strptime(start_date_str, '%Y-%m-%d').date()
+        end_date_str=datetime.strptime(end_date_str, '%Y-%m-%d').date()
     
+        transactions = transactions.filter(
+            timestamp__date__gte=start_date_str,
+            timestamp__date__lte=end_date_str
+        )
+        
+        balance = transactions.aggregate(Sum('amount'))['amount__sum'] or 0
+    else:
+        balance=account.balance
+
+    context={
+        'transactions': transactions.distinct(),
+        'account': account,
+        'balance': balance
+    }
+
+    return render(request, 'transaction_report.html', context)
