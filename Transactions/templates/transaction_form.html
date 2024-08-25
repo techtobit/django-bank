@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block title %}
+<h1 class='text-center pt-4'>{{title}}</h1>
+{% endblock title %}
+
+{% block content %}
+{% load crispy_forms_tags %}
+<form class="col-6 mx-auto card p-3 shadow-lg" method="POST">
+    {% csrf_token %}
+    <!-- Display error/success messages -->
+    {% if messages %}
+    <div class="alert alert-primary" role="alert">
+        {% for message in messages %}
+        {{ message }}
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Render form fields -->
+    {{ form|crispy }}
+
+    <button type="submit" class="btn btn-primary">Submit</button>
+</form>
+{% endblock content %}
