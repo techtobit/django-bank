@@ -40,3 +40,16 @@ class WithdrawForm(TransactionForm):
         return amount
 
 
+
+class LoanRequestForm(TransactionForm):
+    def clean_amount(self):
+        balance=self.user_account.balance if self.user_account else None
+        max_eligible_loan= balance*2
+        amount = self.cleaned_data.get('amount')
+        if max_eligible_loan < amount:
+            raise forms.ValidationError(f'You are eligible loan in between {max_eligible_loan}')
+        
+        return amount
+    
+
+

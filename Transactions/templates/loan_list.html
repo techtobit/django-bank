@@ -1,0 +1,43 @@
+{% block content %}
+
+
+
+
+{% if title == "Loan Request" %}
+    <div class="container mt-4">
+        <h2>Loan Details</h2>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th scope="col">#Id</th>
+                    <th scope="col">Request Amount</th>
+                    <th scope="col">Transaction Type</th>
+                    <th scope="col">Balance</th>
+                    <th scope="col">Timestamp</th>
+                    <th scope="col">Loan Approved</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for loan in loan_list %}
+                    <tr>
+                        <th scope="row">{{ loan.id }}</th>
+                        <td>{{ loan.amount }}</td>
+                        <td>{{ loan.get_transaction_type_display }}</td>
+                        <td>{{ loan.balance_after_transaction }}</td>
+                        <td>{{ loan.timestamp }}</td>
+                        <td>
+                            {% if loan.loan_approv %}
+                                <span class="badge badge-success text-success">Approved</span>
+                            {% else %}
+															<a href="{% url 'approve_loan' loan.id %}" class="btn btn-primary">Approve</a>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endif %}
+
+
+{% endblock content %}
