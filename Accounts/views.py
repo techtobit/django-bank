@@ -5,6 +5,9 @@ from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from django.http import HttpResponse
+from django.conf import settings
+from django.core.mail import send_mail
+
 from .forms import RegistrationForm , UpdateProfileForm
 
 def RegistrationView(request):
@@ -12,6 +15,14 @@ def RegistrationView(request):
 		form = RegistrationForm(request.POST)
 		if form.is_valid():
 			form.save()
+			# send mail 
+			subject = 'Welcome Massage',
+			nl='\n'
+			message = f"Dear {user.username}, {nl} Welcome to our online banking {nl} Wish you very good day!. {nl} Regards, {nl} Ashraf Uddin"
+			email_from = settings.EMAIL_HOST_USER
+			recipient_list = [user.email, ]
+			send_mail( subject, message, email_from, recipient_list )
+			
 			return redirect('login')
 	else:
 		form = RegistrationForm()
@@ -33,7 +44,6 @@ def LoginView(request):
 	return render(request, 'login.html')
 
 def LogoutView(request):
-	# if request.method=="POST":
 		logout(request)
 		return redirect('login')
 
@@ -55,6 +65,15 @@ def PasswordChangeView(request):
 			user.save()
 
 			update_session_auth_hash(request, user)
+			
+			# send mail 
+			subject = 'Password Changed',
+			nl='\n'
+			message = f"Dear {user.username}, {nl} Your online banking platfrom passwrod changed {nl} If this was not you plase contact us ASAP!. {nl} Regards, {nl} Ashraf Uddin"
+			email_from = settings.EMAIL_HOST_USER
+			recipient_list = [user.email, ]
+			send_mail( subject, message, email_from, recipient_list )
+			
 			messages.success(request, 'You password was successfully updated')
 		else:
 			messages.error(request, 'Requset to update password failed')

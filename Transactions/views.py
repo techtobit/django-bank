@@ -6,9 +6,13 @@ from django.contrib import messages
 from datetime import datetime  
 from decimal import Decimal
 from django.db.models import Sum
+
+from django.conf import settings
+from django.core.mail import send_mail
+from Transactions.models import Transaction
+
 from .forms import TransactionForm, DepositForm, WithdrawForm, LoanRequestForm, TransferBalanceFrom
 from .constants import TRANSACTIONS_TYPE
-from Transactions.models import Transaction
 from Accounts.models import Account
 
 def TransactionView(request):
@@ -197,8 +201,28 @@ def TransferBalanceView(request):
         # Proceed with the transfer
         sender_account.balance -= amount
         recipient_account.balance += amount
+
+
+
+
         sender_account.save()
+
+        subject = 'Transfer Founds - Transaction',
+        nl='\n'
+        message = f"Dear { sender_account.user} , {nl} Funds ${amount}USD successully sended to {sender_account.account_number}. {nl} Your current is {sender_account.balance}, {nl} Thanks for banking with  us❤️"
+        email_from = settings.EMAIL_HOST_USER
+        recipient_list = [sender_account.user.email ]
+        send_mail( subject, message, email_from, recipient_list )
+
         recipient_account.save()
+        # print("sender_account-", sender_account , " |account_number", sender_account.account_number , "| email-", sender_account.email)
+        # send mail - Recever
+        subject = 'Transfer Founds - Transaction',
+        nl='\n'
+        message = f"Dear { recipient_account.user} , {nl} Funds ${amount}USD Recived from Account Number {recipient_account.account_number}. {nl} Your current is ${recipient_account.balance}, {nl} Thanks for banking with us❤️"
+        email_from = settings.EMAIL_HOST_USER
+        recipient_list = [recipient_account.user.email ]
+        send_mail( subject, message, email_from, recipient_list )
 
         # Record the transaction for the sender
         Transaction.objects.create(
