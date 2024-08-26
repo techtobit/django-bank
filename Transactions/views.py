@@ -4,10 +4,12 @@ from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from datetime import datetime  
+from decimal import Decimal
 from django.db.models import Sum
-from .forms import TransactionForm, DepositForm, WithdrawForm, LoanRequestForm
+from .forms import TransactionForm, DepositForm, WithdrawForm, LoanRequestForm, TransferBalanceFrom
 from .constants import TRANSACTIONS_TYPE
 from Transactions.models import Transaction
+from Accounts.models import Account
 
 def TransactionView(request):
     if request.method == 'POST':
@@ -124,3 +126,98 @@ def TransactionReportView(request):
     }
 
     return render(request, 'transaction_report.html', context)
+
+
+
+# def TransferBalanceView(request):
+#     sender_account=request.user.account
+#     if request.method=='POST':
+#         form=TransferBalanceFrom(request.POST, sender_account=sender_account)
+#         if form.is_valid():
+#             recipient_account_number=form.cleaned_data['recipient_account_number']
+#             amount=form.cleaned_data['recipient_account_number']
+
+#             recipient_account=Account.objects.filter(account_number=recipient_account_number)
+
+#             sender_account.balance -=amount
+#             sender_account.save()
+
+#             recipient_account.balance +=amount
+#             recipient_account.save()
+
+#             Transaction.objects.create(
+#                 account=sender_account.id,
+#                 amount= amount,
+#                 transaction_type='transfer',
+#                 balance_after_transaction =sender_account.balance
+#             )
+
+#             Transaction.objects.create(
+#                 account=recipient_account.id,
+#                 amount= amount,
+#                 transaction_type='deposit',
+#                 balance_after_transaction =recipient_account.balance
+#             )
+
+#             messages.success(request, 'Amount Transfer Succesfull')
+#             return redirect('transfer')
+#     else:
+#         form=TransferBalanceFrom()
+    
+#     context={
+#         'form':form,
+#         'title': 'Transfer Money'
+#     }
+
+#     return render(request, 'transfer.html', context)
+
+
+
+def TransferBalanceView(request):
+    if request.method == 'POST':
+        form=TransferBalanceFrom(request.POST)
+        if form.is_valid():
+            recipient_account_number = form.cleaned_data['recipient_account_number']
+            amount = form.cleaned_data['amount']
+            
+        
+        try:
+            recipient_account = get_object_or_404(Account, account_number=recipient_account_number)
+        except Http404:
+            messages.error(request, "Recipient account not found.")
+            return redirect('transfer')
+
+        sender_account = request.user.account
+        
+        # Ensure sufficient balance
+        if sender_account.balance < amount:
+            messages.error(request, "Insufficient balance for this transfer.")
+            return redirect('transfer')
+
+        # Proceed with the transfer
+        sender_account.balance -= amount
+        recipient_account.balance += amount
+        sender_account.save()
+        recipient_account.save()
+
+        # Record the transaction for the sender
+        Transaction.objects.create(
+            account=sender_account,
+            amount=amount,
+            transaction_type='transfer_out',  # or 'debit' or any other suitable label
+            balance_after_transaction=sender_account.balance,
+        )
+
+        # Record the transaction for the recipient
+        Transaction.objects.create(
+            account=recipient_account,
+            amount=amount,
+            transaction_type='transfer_in',  # or 'credit' or any other suitable label
+            balance_after_transaction=recipient_account.balance,
+        )
+
+        messages.success(request, f"Successfully transferred {amount} to account {recipient_account_number}.")
+        return redirect('transfer')  # Redirect to a success page or any other appropriate page
+    else:
+        form=TransferBalanceFrom()
+    return render(request, 'transfer.html', {'form':form})

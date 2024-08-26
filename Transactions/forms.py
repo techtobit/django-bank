@@ -1,6 +1,7 @@
 from django import forms
 from decimal import Decimal
 from .models import Transaction
+from Accounts.models import Account
 from .constants import TRANSACTIONS_TYPE
 
 class TransactionForm(forms.ModelForm):
@@ -52,4 +53,47 @@ class LoanRequestForm(TransactionForm):
         return amount
     
 
+# class TransferBalanceFrom(forms.Form):
+#     recipient_account_number= forms.IntegerField(label="Recipient's Account Number", required=True)
+#     amount= forms.DecimalField(max_digits=12, decimal_places=2, required=True)
 
+#     def __init__(self, *args, **kwargs):
+#         sender_account_number= kwargs.pop('sender_account', None)
+#         super().__init__(*args, **kwargs)
+
+#     def clean(self):
+#         cleaned_data = super().clean()
+#         recipient_account_number = cleaned_data.get('recipient_account_number')
+#         amount=cleaned_data.get('amount')
+            
+#         try:
+#             recipient_account=Transaction.objects.filter(account_number=recipient_account_number)
+#         except Account.DoesNotExist:
+#             raise forms.ValidationError('The recipient account does not exit.')
+
+#         if self.sender_account_number.balance < amount:
+#             raise forms.ValidationError("Insufficient balance for this transaction.")
+        
+#         return cleaned_data
+
+
+
+class TransferBalanceFrom(forms.Form):
+    recipient_account_number= forms.IntegerField(
+        label="Recipient's Account Number", 
+        required=True,
+        widget=forms.NumberInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Enter recipient account number'
+        })
+        )
+    amount= forms.DecimalField(
+        max_digits=12, 
+        decimal_places=2, 
+        required=True, 
+        label="Recipient's Account Number", 
+        widget=forms.NumberInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Enter amount to ransfer'
+        })
+    )
