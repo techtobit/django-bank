@@ -1,6 +1,9 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.models import User
+from django.contrib.auth.forms import PasswordChangeForm
+from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth import authenticate, login, logout
+from django.contrib import messages
 from django.http import HttpResponse
 from .forms import RegistrationForm , UpdateProfileForm
 
@@ -44,3 +47,18 @@ def UpdateProfileView(request):
 		form = UpdateProfileForm(instance=request.user)
 	return render(request, 'profile.html', {'form': form})
 
+
+def PasswordChangeView(request):
+	if request.method=='POST':
+		form = PasswordChangeForm(request.user, request.POST)
+		if form.is_valid():
+			user.save()
+
+			update_session_auth_hash(request, user)
+			messages.success(request, 'You password was successfully updated')
+		else:
+			messages.error(request, 'Requset to update password failed')
+	else:
+		form=PasswordChangeForm(request.user)
+
+	return render(request, 'password_change.html', {"form": form})
